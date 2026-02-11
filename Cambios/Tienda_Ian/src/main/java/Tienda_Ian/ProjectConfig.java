@@ -1,4 +1,4 @@
-package com.tienda_l;
+package Tienda_Ian;
 
 import java.util.Locale;
 import org.springframework.context.MessageSource;
@@ -17,7 +17,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 @Configuration
 public class ProjectConfig implements WebMvcConfigurer {
 
-    /* Los siguiente métodos son para implementar el tema de seguridad dentro del proyecto */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
@@ -28,11 +27,10 @@ public class ProjectConfig implements WebMvcConfigurer {
         registry.addViewController("/registro/nuevo").setViewName("/registro/nuevo");
     }
 
-    /* El siguiente método se utilizar para publicar en la nube, independientemente  */
     @Bean
     public SpringResourceTemplateResolver templateResolver_0() {
         SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
-        resolver.setPrefix("classpath:/templates");
+        resolver.setPrefix("classpath:/templates/");
         resolver.setSuffix(".html");
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setOrder(0);
@@ -60,7 +58,7 @@ public class ProjectConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registro) {
         registro.addInterceptor(localeChangeInterceptor());
     }
-    
+
     @Bean("messageSource")
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -69,4 +67,3 @@ public class ProjectConfig implements WebMvcConfigurer {
         return messageSource;
     }
 }
- 
