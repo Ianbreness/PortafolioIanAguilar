@@ -1,81 +1,89 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
 
-    <head th:replace="~{general/fragmentos :: head}"/>
+    <!-- Fragmento: tabs de categorías -->
+    <section th:fragment="tabs" class="container-fluid pt-3 pb-2">
+        <ul class="nav nav-underline justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/}">Todas</a>
+            </li>
+            <li class="nav-item" th:each="cat : ${categorias}">
+                <a class="nav-link" th:href="@{/consultas/{id}(id=${cat.idCategoria})}"
+                   th:text="${cat.descripcion}">Categoría</a>
+            </li>
+        </ul>
+    </section>
 
-    <body>
-
-        <!-- Fragmento 1: Tabs de categorías -->
-        <section th:fragment="tabs" class="py-3 mb-4">
-            <div class="d-flex justify-content-center px-5">
-                <ul class="nav nav-underline">
-                    <li class="nav-item">
-                        <a th:href="@{/}"
-                           th:classappend="${idCategoriaActual == null} ? 'active'"
-                           class="nav-link"
-                           aria-current="page">
-                            [[#{pruebas.todas}]]
-                        </a>
-                    </li>
-                    <li th:each="c : ${categorias}" class="nav-item">
-                        <a th:href="@{/consultas/{id}(id=${c.idCategoria})}"
-                           th:classappend="${idCategoriaActual != null and idCategoriaActual.equals(c.idCategoria)} ? 'active'"
-                           class="nav-link">
-                            [[${c.descripcion}]]
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Fragmento 2: Tarjetas de productos -->
-        <section th:fragment="tarjetas" class="container py-4">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
-                <div th:each="p : ${productos}" class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="d-flex justify-content-center align-items-center bg-light p-3"
-                             style="height: 200px;">
-                            <img th:src="${p.rutaImagen}" class="img-fluid"
-                                 th:alt="${p.descripcion}"
-                                 style="max-height: 100%; object-fit: contain;"/>
-                        </div>
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-center text-truncate mb-0"
-                                th:text="${p.descripcion}">Título</h5>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <p class="card-text text-muted mb-auto text-truncate"
-                               th:text="${p.detalle}">Detalle</p>
-                        </div>
-                        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                            <div class="fw-bold">
-                                <!-- Precio -->
-                                <span class="text-success h5"
-                                      th:text="${#numbers.formatCurrency(p.precio)}">$99.99</span>
-                                <!-- Badge unidades si hay stock -->
-                                <span th:if="${p.existencias > 0}"
-                                      class="badge text-bg-success ms-2"
-                                      th:text="${p.existencias} + ' unidades'"></span>
-                                <!-- Badge agotado si no hay stock -->
-                                <span th:unless="${p.existencias > 0}"
-                                      class="badge text-bg-danger ms-2">Agotado</span>
-                            </div>
-                            <form th:action="@{/carrito/agregar}" method="POST" class="d-inline">
-                                <input type="hidden" th:value="${p.idProducto}" name="idProducto"/>
-                                <button type="submit"
-                                        class="btn btn-sm btn-primary"
-                                        th:disabled="${p.existencias == 0}"
-                                        onclick="addCart(this.form)">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
-                            </form>
-                        </div>
+    <!-- Fragmento: tarjetas de productos -->
+    <section th:fragment="tarjetas" class="container-fluid p-3">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+            <div class="col" th:each="p : ${productos}">
+                <div class="card h-100">
+                    <img th:src="${p.rutaImagen}" class="card-img-top"
+                         style="height:180px; object-fit:cover;"
+                         alt="imagen producto"/>
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${p.descripcion}">Nombre</h5>
+                        <p class="card-text text-muted small"
+                           th:text="${#strings.abbreviate(p.detalle, 50)}">Detalle...</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-success h5"
+                              th:text="'₡' + ${#numbers.formatDecimal(p.precio, 1, 'WHITESPACE', 2, 'COMMA')}">₡0</span>
+                        <span th:if="${p.existencias != null and p.existencias > 0}"
+                              class="badge text-bg-success ms-2"
+                              th:text="${p.existencias} + ' unidades'">Stock</span>
+                        <span th:if="${p.existencias == null or p.existencias == 0}"
+                              class="badge text-bg-danger ms-2">Agotado</span>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-    </body>
+    <!-- Fragmento: formularios de consultas -->
+    <section th:fragment="consultas" class="row row-cols-4 p-2">
+        <div th:replace="~{consultas/fragmentos :: formConsulta('primary',#{consultas.derivadas},'/consultas/consultaDerivada')}"/>
+        <div th:replace="~{consultas/fragmentos :: formConsulta('warning',#{consultas.jpql},'/consultas/consultaJPQL')}"/>
+        <div th:replace="~{consultas/fragmentos :: formConsulta('success',#{consultas.sql},'/consultas/consultaSQL')}"/>
+        <div class="card"><p>Acá va su Práctica #2</p></div>
+    </section>
+
+    <!-- Fragmento parametrizado: formulario reutilizable -->
+    <div th:fragment="formConsulta(colorForm, textoForm, urlForm)">
+        <form method="post" th:action="@{${urlForm}}" class="was-validated">
+            <div class="card p-2">
+                <div class="card-header text-center text-white"
+                     th:classappend="'bg-'+${colorForm}">
+                    <h5>[[${textoForm}]]</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label>[[#{consultas.precio.inferior}]]</label>
+                        <input type="number" name="precioInf"
+                               th:value="${precioInf}"
+                               class="form-control" min="0" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label>[[#{consultas.precio.superior}]]</label>
+                        <input type="number" name="precioSup"
+                               th:value="${precioSup}"
+                               class="form-control" min="0" required/>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn text-white"
+                            th:classappend="'btn-'+${colorForm}">
+                        <i class="fa-solid fa-magnifying-glass"></i> [[${textoForm}]]
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</body>
 </html>

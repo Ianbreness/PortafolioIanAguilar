@@ -2,6 +2,7 @@ package Tienda_Ian.service;
 
 import Tienda_Ian.domain.Producto;
 import Tienda_Ian.repository.ProductoRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,26 @@ public class ProductoService {
     @Transactional
     public void delete(Integer id) throws Exception {
         productoRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaDerivada(double precioInf, double precioSup) {
+        return productoRepository.findByPrecioBetween(
+                new BigDecimal(precioInf),
+                new BigDecimal(precioSup));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaJPQL(double precioInf, double precioSup) {
+        return productoRepository.buscarPorRangoPrecioJPQL(
+                new BigDecimal(precioInf),
+                new BigDecimal(precioSup));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaSQL(double precioInf, double precioSup) {
+        return productoRepository.buscarPorRangoPrecioSQL(
+                new BigDecimal(precioInf),
+                new BigDecimal(precioSup));
     }
 }

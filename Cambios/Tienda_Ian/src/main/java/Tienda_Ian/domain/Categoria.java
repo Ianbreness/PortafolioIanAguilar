@@ -23,13 +23,12 @@ public class Categoria implements Serializable {
     @Size(max = 50)
     private String descripcion;
 
-    @Column(length = 1024)
+    @Column(name = "ruta_imagen", length = 1024)
     @Size(max = 1024)
     private String rutaImagen;
 
     private boolean activo;
 
-    // Relación uno a muchos: una categoría tiene muchos productos
     @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
     private List<Producto> productos;
 }
