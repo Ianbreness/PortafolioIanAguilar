@@ -1,50 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package Tienda_Ian.domain;
 
-/**
- *
- * @author brene
- */
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name="categoria")
+@Table(name = "categoria")
 public class Categoria implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_categoria")
+    @Column(name = "id_categoria")
     private Integer idCategoria;
-    
-    @Column(unique=true, nullable=false, length=50)
+
+    @Column(unique = true, nullable = false, length = 50)
     @NotNull
-    @Size(max=50)
+    @Size(max = 50)
     private String descripcion;
-    
-    @Column(length=1024)
-    @Size(max=1024)
+
+    @Column(length = 1024)
+    @Size(max = 1024)
     private String rutaImagen;
-    
+
     private boolean activo;
-            
+
+    // Relación uno a muchos: una categoría tiene muchos productos
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
+    private List<Producto> productos;
 }
-
-/*
-create table categoria (
-  id_categoria INT NOT NULL AUTO_INCREMENT,
-  descripcion VARCHAR(50) NOT NULL,
-  ruta_imagen varchar(1024),
-  activo boolean,  
-
-*/
-

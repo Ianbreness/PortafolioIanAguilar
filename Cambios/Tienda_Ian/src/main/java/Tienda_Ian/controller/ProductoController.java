@@ -1,7 +1,7 @@
 package Tienda_Ian.controller;
-
-import Tienda_Ian.domain.Categoria;
+import Tienda_Ian.domain.Producto;
 import Tienda_Ian.service.CategoriaService;
+import Tienda_Ian.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,48 +13,52 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("/categoria")
-public class CategoriaController {
+@RequestMapping("/producto")
+public class ProductoController {
+
+    @Autowired
+    private ProductoService productoService;
 
     @Autowired
     private CategoriaService categoriaService;
 
     @GetMapping("/listado")
     public String listado(Model model) {
-        var categorias = categoriaService.getCategorias(false);
-        model.addAttribute("categorias", categorias);
-        model.addAttribute("totalCategorias", categorias.size());
-        model.addAttribute("categoria", new Categoria());
-        return "/categoria/listado";
+        var productos = productoService.getProductos(false);
+        model.addAttribute("productos", productos);
+        model.addAttribute("totalProductos", productos.size());
+        model.addAttribute("producto", new Producto());
+        model.addAttribute("categorias", categoriaService.getCategorias(true));
+        return "/producto/listado";
     }
 
     @GetMapping("/modificar/{id}")
     public String modificar(@PathVariable Integer id, Model model) {
-        // Ahora retorna Optional, usamos orElse para obtener la categoria
-        Categoria categoria = categoriaService.getCategoria(id).orElse(new Categoria());
-        model.addAttribute("categoria", categoria);
-        return "/categoria/modifica";
+        Producto producto = productoService.getProducto(id);
+        model.addAttribute("producto", producto);
+        model.addAttribute("categorias", categoriaService.getCategorias(true));
+        return "/producto/modifica"; // ← único cambio
     }
 
     @PostMapping("/guardar")
-    public String guardar(Categoria categoria,
+    public String guardar(Producto producto,
             @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile,
             Model model) {
         try {
-            categoriaService.save(categoria, imagenFile);
+            productoService.save(producto, imagenFile);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
-        return "redirect:/categoria/listado";
+        return "redirect:/producto/listado";
     }
 
     @PostMapping("/eliminar")
-    public String eliminar(Integer idCategoria, Model model) {
+    public String eliminar(Integer idProducto, Model model) {
         try {
-            categoriaService.delete(idCategoria);
+            productoService.delete(idProducto);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
-        return "redirect:/categoria/listado";
+        return "redirect:/producto/listado";
     }
 }

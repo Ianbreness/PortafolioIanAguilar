@@ -5,10 +5,6 @@
 
 package Tienda_Ian.repository;
 
-/**
- *
- * @author brene
- */
 import Tienda_Ian.domain.Categoria;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

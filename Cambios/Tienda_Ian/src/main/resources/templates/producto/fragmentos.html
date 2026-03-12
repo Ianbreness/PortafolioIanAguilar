@@ -7,45 +7,64 @@
 
     <body>
 
-        <!-- Fragmento 1: Botón + Modal para Agregar Categoría -->
+        <!-- Fragmento 1: Botón + Modal para Agregar Producto -->
         <section th:fragment="agregar">
             <div class="row py-4 mb-2 bg-light">
                 <div class="col-md-1"></div>
                 <div class="col-md-3">
                     <button type="button" class="btn btn-primary"
                             sec:authorize="hasRole('ROLE_ADMIN')"
-                            data-bs-toggle="modal" data-bs-target="#agregarCategoriaModal">
-                        <i class="fa-solid fa-plus"></i> [[#{categoria.agregar}]]
+                            data-bs-toggle="modal" data-bs-target="#agregarProductoModal">
+                        <i class="fa-solid fa-plus"></i> [[#{producto.agregar}]]
                     </button>
                 </div>
             </div>
 
-            <div class="modal fade" id="agregarCategoriaModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
+            <div class="modal fade" id="agregarProductoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header bg-info text-white">
                             <h1 class="modal-title fs-5">
-                                <i class="fa-solid fa-layer-group"></i> [[#{categoria.agregar}]]
+                                <i class="fa-solid fa-box"></i> [[#{producto.agregar}]]
                             </h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <!-- th:object apunta al objeto vacío que el controller agrega al modelo -->
-                        <form th:action="@{/categoria/guardar}" th:object="${categoria}"
+                        <form th:action="@{/producto/guardar}" th:object="${producto}"
                               class="was-validated" enctype="multipart/form-data" method="post">
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label>[[#{categoria.descripcion}]]</label>
+                                    <label>[[#{producto.descripcion}]]</label>
                                     <input type="text" name="descripcion" class="form-control" required="true"/>
                                 </div>
                                 <div class="mb-3">
-                                    <label>[[#{categoria.activo}]]</label>
+                                    <label>[[#{producto.detalle}]]</label>
+                                    <textarea name="detalle" class="form-control" rows="2"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{producto.precio}]]</label>
+                                    <input type="number" step="0.01" name="precio" class="form-control" required="true"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{producto.existencias}]]</label>
+                                    <input type="number" name="existencias" class="form-control"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{producto.categoria}]]</label>
+                                    <select name="categoria.idCategoria" class="form-select">
+                                        <option th:each="cat : ${categorias}"
+                                                th:value="${cat.idCategoria}"
+                                                th:text="${cat.descripcion}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{producto.activo}]]</label>
                                     <input type="checkbox" name="activo" class="form-check-input"/>
                                 </div>
                                 <div class="mb-3">
-                                    <label>[[#{categoria.imagen}]]</label>
+                                    <label>[[#{producto.imagen}]]</label>
                                     <input type="file" name="imagenFile" class="form-control"
                                            onchange="mostrarImagen(this);"/>
-                                    <img id="blah" src="#" alt="imagen de categoría" height="200"/>
+                                    <img id="blahProducto" src="#" alt="imagen producto" height="100"/>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -62,43 +81,49 @@
             </div>
         </section>
 
-        <!-- Fragmento 2: Tabla con listado de categorías -->
+        <!-- Fragmento 2: Tabla con listado de productos -->
         <section th:fragment="listado" class="p-3">
             <div class="row p-3">
                 <div class="col-md-9">
                     <div class="card p-2">
-                        <div class="card-header"><h4>[[#{categoria.listado}]]</h4></div>
+                        <div class="card-header"><h4>[[#{producto.listado}]]</h4></div>
                         <div class="card-body">
-                            <div th:if="${categorias != null and !categorias.empty}">
+                            <div th:if="${productos != null and !productos.empty}">
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>[[#{categoria.descripcion}]]</th>
-                                            <th>[[#{categoria.imagen}]]</th>
-                                            <th>[[#{categoria.activo}]]</th>
+                                            <th>[[#{producto.descripcion}]]</th>
+                                            <th>[[#{producto.precio}]]</th>
+                                            <th>[[#{producto.existencias}]]</th>
+                                            <th>[[#{producto.categoria}]]</th>
+                                            <th>[[#{producto.imagen}]]</th>
+                                            <th>[[#{producto.activo}]]</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="c : ${categorias}">
-                                            <td>[[${c.idCategoria}]]</td>
-                                            <td>[[${c.descripcion}]]</td>
+                                        <tr th:each="p : ${productos}">
+                                            <td>[[${p.idProducto}]]</td>
+                                            <td>[[${p.descripcion}]]</td>
+                                            <td>[[${p.precio}]]</td>
+                                            <td>[[${p.existencias}]]</td>
+                                            <td th:text="${p.categoria != null ? p.categoria.descripcion : '-'}"></td>
                                             <td>
-                                                <img th:if="${c.rutaImagen != null}"
-                                                     th:src="@{${c.rutaImagen}}"
-                                                     alt="imagen" height="75"/>
+                                                <img th:if="${p.rutaImagen != null}"
+                                                     th:src="@{${p.rutaImagen}}"
+                                                     alt="img" height="50"/>
                                             </td>
-                                            <td th:text="${c.activo} ? 'Activa' : 'Inactiva'"></td>
+                                            <td th:text="${p.activo} ? 'Activo' : 'Inactivo'"></td>
                                             <td>
                                                 <button type="button" class="btn btn-danger btn-sm"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#confirmModal"
-                                                        th:data-bs-id="${c.idCategoria}"
-                                                        th:data-bs-descripcion="${c.descripcion}">
+                                                        data-bs-target="#confirmProductoModal"
+                                                        th:data-bs-id="${p.idProducto}"
+                                                        th:data-bs-descripcion="${p.descripcion}">
                                                     <i class="fa-solid fa-trash"></i> [[#{accion.eliminar}]]
                                                 </button>
-                                                <a th:href="@{/categoria/modificar/}+${c.idCategoria}"
+                                                <a th:href="@{/producto/modificar/}+${p.idProducto}"
                                                    class="btn btn-warning btn-sm">
                                                     <i class="fas fa-pencil-alt"></i> [[#{accion.actualizar}]]
                                                 </a>
@@ -108,7 +133,7 @@
                                 </table>
                             </div>
                             <div class="text-center p-2"
-                                 th:if="${categorias == null or categorias.empty}">
+                                 th:if="${productos == null or productos.empty}">
                                 <span>[[#{lista.vacia}]]</span>
                             </div>
                         </div>
@@ -117,9 +142,9 @@
                 <div class="col-md-3">
                     <div class="card text-center bg-success text-white mb-3">
                         <div class="card-body">
-                            <h3>[[#{categoria.total}]]</h3>
+                            <h3>[[#{producto.total}]]</h3>
                             <h4 class="fs-2">
-                                <i class="fas fa-layer-group"></i> [[${totalCategorias}]]
+                                <i class="fas fa-box"></i> [[${totalProductos}]]
                             </h4>
                         </div>
                     </div>
@@ -127,19 +152,19 @@
             </div>
         </section>
 
-        <!-- Fragmento 3: Formulario de edición (usado en modificar.html) -->
+        <!-- Fragmento 3: Formulario de edición (usado en modifica.html) -->
         <section th:fragment="editar">
             <div class="row">
                 <div class="col-md-2"></div>
                 <div class="col-md-8">
-                    <form method="POST" th:action="@{/categoria/guardar}"
-                          th:object="${categoria}" class="was-validated"
+                    <form method="POST" th:action="@{/producto/guardar}"
+                          th:object="${producto}" class="was-validated"
                           enctype="multipart/form-data">
-                        <input type="hidden" name="idCategoria" th:field="*{idCategoria}"/>
+                        <input type="hidden" name="idProducto" th:field="*{idProducto}"/>
                         <input type="hidden" name="rutaImagen" th:field="*{rutaImagen}"/>
                         <div class="row py-4 mb-4 bg-light">
                             <div class="col-md-4 d-grid">
-                                <a th:href="@{/categoria/listado}" class="btn btn-primary">
+                                <a th:href="@{/producto/listado}" class="btn btn-primary">
                                     <i class="fas fa-arrow-left"></i> [[#{accion.regresar}]]
                                 </a>
                             </div>
@@ -157,23 +182,49 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label>[[#{categoria.descripcion}]]</label>
+                                            <label>[[#{producto.descripcion}]]</label>
                                             <input type="text" class="form-control"
                                                    name="descripcion" th:field="*{descripcion}"
                                                    required="true"/>
                                         </div>
                                         <div class="mb-3">
-                                            <label>[[#{categoria.activo}]]</label>
+                                            <label>[[#{producto.detalle}]]</label>
+                                            <textarea class="form-control" name="detalle"
+                                                      th:field="*{detalle}" rows="2"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>[[#{producto.precio}]]</label>
+                                            <input type="number" step="0.01" class="form-control"
+                                                   name="precio" th:field="*{precio}"
+                                                   required="true"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>[[#{producto.existencias}]]</label>
+                                            <input type="number" class="form-control"
+                                                   name="existencias" th:field="*{existencias}"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>[[#{producto.categoria}]]</label>
+                                            <select name="categoria.idCategoria" class="form-select">
+                                                <option th:each="cat : ${categorias}"
+                                                        th:value="${cat.idCategoria}"
+                                                        th:text="${cat.descripcion}"
+                                                        th:selected="${producto.categoria != null and producto.categoria.idCategoria == cat.idCategoria}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>[[#{producto.activo}]]</label>
                                             <input class="form-check-input" type="checkbox"
                                                    name="activo" id="activo" th:field="*{activo}"/>
                                         </div>
                                         <div class="mb-3">
-                                            <label>[[#{categoria.imagen}]]</label>
+                                            <label>[[#{producto.imagen}]]</label>
                                             <input class="form-control" type="file"
                                                    name="imagenFile"
                                                    onchange="mostrarImagen(this);"/>
                                             <img id="blah"
-                                                 th:src="${categoria.rutaImagen != null ? categoria.rutaImagen : '#'}"
+                                                 th:src="${producto.rutaImagen != null ? producto.rutaImagen : '#'}"
                                                  alt="imagen actual" height="200"/>
                                         </div>
                                     </div>
@@ -187,12 +238,12 @@
 
         <!-- Fragmento 4: Modal para confirmar eliminación -->
         <section th:fragment="confirmarEliminar">
-            <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal fade" id="confirmProductoModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <!-- Se usa POST en lugar de GET para eliminar, es más correcto y seguro -->
-                        <form th:action="@{/categoria/eliminar}" method="post">
-                            <input type="hidden" name="idCategoria" id="modalId"/>
+                        <!-- POST en lugar de GET para eliminar -->
+                        <form th:action="@{/producto/eliminar}" method="post">
+                            <input type="hidden" name="idProducto" id="modalProductoId"/>
                             <div class="modal-header bg-warning text-white">
                                 <h5 class="modal-title">
                                     <i class="fa-solid fa-circle-radiation"></i> [[#{accion.confirmar}]]
@@ -200,7 +251,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <p>[[#{accion.confirmar.texto1}]] <span id="modalDescripcion"></span>?</p>
+                                <p>[[#{accion.confirmar.texto1}]] <span id="modalProductoDescripcion"></span>?</p>
                                 <h6>[[#{accion.confirmar.texto2}]]</h6>
                             </div>
                             <div class="modal-footer">
@@ -215,6 +266,18 @@
                     </div>
                 </div>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var modal = document.getElementById('confirmProductoModal');
+                    if (modal) {
+                        modal.addEventListener('show.bs.modal', function (event) {
+                            var button = event.relatedTarget;
+                            document.getElementById('modalProductoId').value = button.getAttribute('data-bs-id');
+                            document.getElementById('modalProductoDescripcion').textContent = button.getAttribute('data-bs-descripcion');
+                        });
+                    }
+                });
+            </script>
         </section>
 
     </body>

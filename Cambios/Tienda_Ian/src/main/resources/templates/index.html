@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<!-- Esta es la página principal del sitio web TechShop -->
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
     <head th:replace="~{general/fragmentos :: head}"/>
 
     <body>
         <header th:replace="~{general/fragmentos :: header}"/>
+
+        <section th:replace="~{consultas/fragmentos :: tabs}"></section>
+
+        <section th:replace="~{consultas/fragmentos :: tarjetas}"></section>
 
         <footer th:replace="~{general/fragmentos :: footer}"/>
     </body>

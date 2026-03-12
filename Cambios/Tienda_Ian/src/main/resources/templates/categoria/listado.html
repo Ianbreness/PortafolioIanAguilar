@@ -3,15 +3,31 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
-    <head th:replace="~{general/fragmentos :: head}"></head>
+    <head th:replace="~{general/fragmentos :: head}">
+        <title>TechShop</title>
+    </head>
 
     <body>
         <header th:replace="~{general/fragmentos :: header}"></header>
 
         <section th:replace="~{categoria/fragmentos :: agregar}"></section>
+
         <section th:replace="~{categoria/fragmentos :: listado}"></section>
+
         <section th:replace="~{categoria/fragmentos :: confirmarEliminar}"></section>
-        <section th:replace="~{general/fragmentos :: mostrarToast}"></section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var confirmModal = document.getElementById('confirmModal');
+                if (confirmModal) {
+                    confirmModal.addEventListener('show.bs.modal', function (event) {
+                        var button = event.relatedTarget;
+                        document.getElementById('modalId').value = button.getAttribute('data-bs-id');
+                        document.getElementById('modalDescripcion').textContent = button.getAttribute('data-bs-descripcion');
+                    });
+                }
+            });
+        </script>
 
         <footer th:replace="~{general/fragmentos :: footer}"></footer>
     </body>
