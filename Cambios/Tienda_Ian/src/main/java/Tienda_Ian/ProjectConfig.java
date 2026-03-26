@@ -1,7 +1,7 @@
 package Tienda_Ian;
 
-import com.tienda.domain.Ruta;
-import com.tienda.service.RutaService;
+import Tienda_Ian.domain.Ruta;
+import Tienda_Ian.service.RutaService;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +9,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -73,39 +71,5 @@ public class ProjectConfig implements WebMvcConfigurer {
         messageSource.setBasename("messages");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        List<Ruta> rutas = rutaService.getRutas();
-        http.authorizeHttpRequests(requests -> {
-            for (Ruta ruta : rutas) {
-                if (ruta.isRequiereRol()) {
-                    requests.requestMatchers(ruta.getRuta()).hasRole(ruta.getRol().getRol());
-                } else {
-                    requests.requestMatchers(ruta.getRuta()).permitAll();
-                }
-            }
-            requests.anyRequest().authenticated();
-        });
-        http.formLogin(form -> form
-            .loginPage("/login")
-            .loginProcessingUrl("/login")
-            .defaultSuccessUrl("/", true)
-            .failureUrl("/login?error=true")
-            .permitAll()
-        ).logout(logout -> logout
-            .logoutUrl("/logout")
-            .logoutSuccessUrl("/login?logout=true")
-            .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID")
-            .permitAll()
-        ).exceptionHandling(exceptions -> exceptions
-            .accessDeniedPage("/acceso_denegado")
-        ).sessionManagement(session -> session
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(false)
-        );
-        return http.build();
     }
 }
