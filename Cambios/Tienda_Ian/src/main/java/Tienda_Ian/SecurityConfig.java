@@ -1,9 +1,10 @@
 package Tienda_Ian;
 
 import Tienda_Ian.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,16 +13,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+
+    public SecurityConfig(@Lazy UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     public static final String[] PUBLIC_URLS = {
         "/", "/index", "/fav/**", "/carrito/**", "/consultas/**", "/registro/**",
-        "/js/**", "/webjars/**", "/login", "/acceso_denegado"
-    };
-
-    public static final String[] USUARIO_URLS = {
-        "/facturar/carrito"
+        "/js/**", "/css/**", "/webjars/**", "/login", "/acceso_denegado"
     };
 
     public static final String[] ADMIN_OR_VENDEDOR_URLS = {
@@ -33,11 +33,18 @@ public class SecurityConfig {
     };
 
     @Bean
+    public static PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        // Configurar UserDetailsService + PasswordEncoder directamente en HttpSecurity
+        http.userDetailsService(usuarioService);
 
         http.authorizeHttpRequests(request -> request
                 .requestMatchers(PUBLIC_URLS).permitAll()
-                .requestMatchers(USUARIO_URLS).hasRole("USUARIO")
                 .requestMatchers(ADMIN_OR_VENDEDOR_URLS).hasAnyRole("ADMIN", "VENDEDOR")
                 .requestMatchers(ADMIN_URLS).hasRole("ADMIN")
                 .anyRequest().authenticated()
@@ -61,10 +68,5 @@ public class SecurityConfig {
         );
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
