@@ -1,45 +1,78 @@
-/* Navbar */
-header nav {
-    background-color: #1a1a2e !important;
-}
-
-header nav .navbar-brand,
-header nav .nav-link {
-    color: white !important;
-}
-
-header nav .nav-link:hover {
-    color: #adb5bd !important;
-}
-
-/* Banner verde debajo del navbar */
-#main-header {
-    background-color: #198754 !important;
-}
-
-/* Footer */
-footer {
-    background-color: #0dcaf0 !important;
-    color: white;
-    position: static;
-    height: auto;
-    width: 100%;
-}
-
-/* Tarjetas de productos */
 .card {
-    border-radius: 10px;
-    transition: transform 0.2s;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    z-index: 1;
 }
-
 .card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Body limpio */
-body {
-    background-color: #f8f9fa;
-    font-family: sans-serif;
-    padding-top: 90px;
+@media print {
+    /* 1. La regla principal: fija la cabecera en cada página */
+    thead {
+        display: table-header-group;
+    }
+
+    /* 2. Regla de compatibilidad (opcional pero recomendada) */
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* 3. Asegura que la tabla no tenga márgenes extraños que rompan el thead */
+    table {
+        margin: 0 !important;
+    }
+
+    /* [Opcional] Si está usando Bootstrap/cards para la tabla, elimine los bordes*/
+    .card, .card-body {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Oculta elementos de navegación, como se explicó antes */
+    .d-print-none, .navbar, .footer {
+        display: none !important;
+    }
 }
+/* =========================
+   🛒 CARRITO DE COMPRAS
+   ========================= */
+
+/* Contenedor del carrito */
+#resultBlock {
+    margin-top: 15px;
+}
+
+/* Tabla del carrito */
+#resultBlock table {
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Encabezado */
+#resultBlock thead {
+    background-color: #343a40;
+    color: white;
+}
+
+/* Filas */
+#resultBlock tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* Total */
+#resultBlock h5 {
+    font-weight: bold;
+}
+
+/* Botones dentro del carrito */
+#resultBlock .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Ajuste para que no rompa el diseño */
+#resultBlock .card {
+    margin-bottom: 10px;
+}
+

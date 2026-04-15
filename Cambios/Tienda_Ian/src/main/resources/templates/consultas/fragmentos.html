@@ -15,30 +15,40 @@
         </ul>
     </section>
 
-    <!-- Fragmento: tarjetas de productos -->
+    <!-- Fragmento: tarjetas de productos con botón agregar al carrito -->
     <section th:fragment="tarjetas" class="container-fluid p-3">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
-            <div class="col" th:each="p : ${productos}">
-                <div class="card h-100">
-                    <img th:src="${p.rutaImagen}" class="card-img-top"
-                         style="height:180px; object-fit:cover;"
-                         alt="imagen producto"/>
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${p.descripcion}">Nombre</h5>
-                        <p class="card-text text-muted small"
-                           th:text="${#strings.abbreviate(p.detalle, 50)}">Detalle...</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <span class="text-success h5"
-                              th:text="'₡' + ${#numbers.formatDecimal(p.precio, 1, 'WHITESPACE', 2, 'COMMA')}">₡0</span>
-                        <span th:if="${p.existencias != null and p.existencias > 0}"
-                              class="badge text-bg-success ms-2"
-                              th:text="${p.existencias} + ' unidades'">Stock</span>
-                        <span th:if="${p.existencias == null or p.existencias == 0}"
-                              class="badge text-bg-danger ms-2">Agotado</span>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </button>
+        <div id="resultBlock">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+                <div class="col" th:each="p : ${productos}">
+                    <div class="card h-100">
+                        <img th:src="${p.rutaImagen}" class="card-img-top"
+                             style="height:180px; object-fit:cover;"
+                             alt="imagen producto"/>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${p.descripcion}">Nombre</h5>
+                            <p class="card-text text-muted small"
+                               th:text="${#strings.abbreviate(p.detalle, 50)}">Detalle...</p>
+                        </div>
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                            <div class="fw-bold">
+                                <span class="text-success h5"
+                                      th:text="${#numbers.formatCurrency(p.precio)}">₡0</span>
+                                <span th:if="${p.existencias != null and p.existencias > 0}"
+                                      class="badge text-bg-success ms-2"
+                                      th:text="${p.existencias} + ' unidades'">Stock</span>
+                                <span th:unless="${p.existencias != null and p.existencias > 0}"
+                                      class="badge text-bg-danger ms-2">Agotado</span>
+                            </div>
+                            <form th:action="@{/carrito/agregar}" th:method="POST" class="d-inline">
+                                <input type="hidden" th:value="${p.idProducto}" name="idProducto"/>
+                                <button type="button"
+                                        class="btn btn-sm btn-primary"
+                                        th:disabled="${p.existencias == 0}"
+                                        onclick="addCart(this.form)">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <head th:replace="~{general/fragmentos :: head}"/>
+    <body>
+        <header th:replace="~{general/fragmentos :: header}"/>
+
+        <section class="container py-4" style="max-width: 800px;">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-file-invoice"></i> Confirmación de la Factura</h4>
+                    <small>Compra procesada con éxito. Factura Nro:
+                        <span th:text="${factura.idFactura}">0</span>
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <!-- Detalle factura -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Detalle de la factura</h6>
+                            <p><strong>Número de Factura:</strong>
+                                <span th:text="${factura.idFactura}">0</span></p>
+                            <p><strong>Fecha de la factura:</strong>
+                                <span th:text="${#temporals.format(factura.fecha, 'dd-MM-yyyy HH:mm')}">-</span></p>
+                            <p><strong>Estado de la Factura:</strong>
+                                <span th:text="${factura.estado}">-</span></p>
+                        </div>
+                        <!-- Cliente -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Cliente</h6>
+                            <p><strong>Nombre:</strong>
+                                <span th:text="${factura.usuario.nombre + ' ' + factura.usuario.apellidos}">-</span></p>
+                            <p><strong>Correo:</strong>
+                                <span th:text="${factura.usuario.correo}">-</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de productos adquiridos -->
+                    <h6 class="fw-bold">Productos adquiridos</h6>
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="v : ${factura.ventas}">
+                                <td th:text="${v.producto.descripcion}">-</td>
+                                <td th:text="${v.cantidad}">0</td>
+                                <td th:text="${#numbers.formatCurrency(v.precioHistorico)}">₡0</td>
+                                <td th:text="${#numbers.formatCurrency(v.precioHistorico.multiply(new java.math.BigDecimal(v.cantidad)))}">₡0</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="3" class="text-end">Total de Compra:</td>
+                                <td class="text-success"
+                                    th:text="${#numbers.formatCurrency(factura.total)}">₡0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="card-footer d-flex justify-content-center gap-2">
+                    <a href="/consultas/listado" class="btn btn-primary">
+                        <i class="fas fa-house"></i> Regresar
+                    </a>
+                    <button onclick="window.print()" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{general/fragmentos :: mostrarToast}"/>
+        <footer th:replace="~{general/fragmentos :: footer}"/>
+    </body>
+</html>
